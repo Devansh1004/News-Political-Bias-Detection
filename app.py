@@ -48,6 +48,7 @@ for i, (label, text) in enumerate(examples.items()):
     if cols[i].button(label):
         st.session_state.input_text = text
 
+st.markdown("#### Or try your own news article:")
 # Main text area
 user_input = st.text_area("📝 Input Text", height=200, value=st.session_state.input_text, key="input_text")
 
