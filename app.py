@@ -23,13 +23,31 @@ label_map = {
 st.title("🗞️ News Bias Detection")
 st.write("Enter a news article snippet to detect its political bias.")
 
-user_input = st.text_area("📝 Input Text", height=200)
+examples = {
+    "Left": "We must invest in renewable energy to fight corporate greed and protect our planet.",
+    "Neutral": "The president announced a new infrastructure bill to improve national transportation.",
+    "Right": "Tax cuts are the best way to boost the economy and reward hardworking Americans."
+}
 
+# Initialize input state
+if "input_text" not in st.session_state:
+    st.session_state.input_text = ""
+
+# Buttons to insert examples
+st.markdown("#### 💡 Try Examples:")
+cols = st.columns(len(examples))
+for i, (label, text) in enumerate(examples.items()):
+    if cols[i].button(label):
+        st.session_state.input_text = text
+
+# Main text area
+user_input = st.text_area("📝 Input Text", height=200, value=st.session_state.input_text, key="input_text")
+
+# Prediction
 if st.button("Analyze Bias"):
     if user_input.strip() == "":
         st.warning("Please enter some text.")
     else:
-        # Tokenize and predict
         inputs = tokenizer(user_input, return_tensors="pt", truncation=True, padding=True, max_length=512)
         with torch.no_grad():
             outputs = model(**inputs)
@@ -39,6 +57,6 @@ if st.button("Analyze Bias"):
 
         bias_label = label_map[pred]
         label_name = { -1: "Left", 0: "Neutral", 1: "Right" }[bias_label]
-        
+
         st.markdown(f"### 🔍 Prediction: **{label_name}**")
         st.markdown(f"Confidence: `{confidence:.2%}`")
